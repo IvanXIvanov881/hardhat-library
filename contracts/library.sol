@@ -4,7 +4,8 @@ pragma solidity ^0.8.20;
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract BookLibrary is Ownable {
-    constructor(address initialOwner) Ownable(initialOwner) public {}
+    constructor(address initialOwner) public Ownable(initialOwner) {}
+
     // Define the structure of a book
     struct Book {
         string name; // Name of the book
@@ -15,12 +16,17 @@ contract BookLibrary is Ownable {
     // Array of all books in the library
     Book[] books;
 
+    // Mapping for easier access of ids based on book names
+    mapping(string => uint256) bookNamesToIds;
+    // Mapping to track all borrowed books by each address
+    mapping(address => string) allBorrowedBooks;
+    // Mapping to track the status of books borrowed by each address
+    mapping(address => mapping(uint256 => uint256)) borrowerToBookIdsToStatus;
+
+    // Function returns all books
     function getBooks() public view returns (Book[] memory) {
         return books;
     }
-
-    // Mapping for easier access of ids based on book names
-    mapping(string => uint256) bookNamesToIds;
 
     // Function to add a book to the library
     function addBook(string calldata _name, uint256 _copies) public onlyOwner {
@@ -51,9 +57,6 @@ contract BookLibrary is Ownable {
         }
         return newBook;
     }
-
-    // Mapping to track the status of books borrowed by each address
-    mapping(address => mapping(uint256 => uint256)) borrowerToBookIdsToStatus;
 
     // Constants for the status of the book
     uint256 constant BORROWED = 1;
@@ -138,9 +141,6 @@ contract BookLibrary is Ownable {
         }
         return availableBooks;
     }
-
-    // Mapping to track all borrowed books by each address
-    mapping(address => string) allBorrowedBooks;
 
     // Function to get the names of all borrowed books
     function borrowedBooks() public view returns (string[] memory) {
