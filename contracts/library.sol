@@ -18,8 +18,6 @@ contract BookLibrary is Ownable {
 
     // Mapping for easier access of ids based on book names
     mapping(string => uint256) bookNamesToIds;
-    // Mapping to track all borrowed books by each address
-    mapping(address => string) allBorrowedBooks;
     // Mapping to track the status of books borrowed by each address
     mapping(address => mapping(uint256 => uint256)) borrowerToBookIdsToStatus;
 
