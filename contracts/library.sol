@@ -4,7 +4,7 @@ pragma solidity ^0.8.20;
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract BookLibrary is Ownable {
-    constructor(address initialOwner) public Ownable(initialOwner) {}
+    constructor(address initialOwner) Ownable(initialOwner) {}
 
     // Define the structure of a book
     struct Book {
@@ -44,12 +44,8 @@ contract BookLibrary is Ownable {
     // Private function to check if a book is new
     function _isNewBook(string calldata _name) private view returns (bool) {
         bool newBook = true;
-
         for (uint256 i = 0; i < books.length; i++) {
-            if (
-                keccak256(abi.encodePacked(books[i].name)) ==
-                keccak256(abi.encodePacked(_name))
-            ) {
+            if (keccak256(abi.encodePacked(books[i].name)) == keccak256(abi.encodePacked(_name))) {
                 newBook = false;
             }
         }
@@ -65,15 +61,9 @@ contract BookLibrary is Ownable {
 
     // Function to borrow a book from the library
     function borrowBook(uint256 _id) public bookMustExist(_id) {
-        require(
-            borrowerToBookIdsToStatus[msg.sender][_id] != BORROWED,
-            "Please return the book first."
-        );
+        require(borrowerToBookIdsToStatus[msg.sender][_id] != BORROWED,"Please return the book first.");
 
-        require(
-            books[_id].copies - books[_id].borrowed > 0,
-            "No available copies."
-        );
+        require(books[_id].copies - books[_id].borrowed > 0,"No available copies.");
 
         require(msg.sender != owner(), "Owner can't borrow the book.");
 
@@ -86,19 +76,13 @@ contract BookLibrary is Ownable {
     }
 
     // Function to get the status of a book for a specific address
-    function getBookStatus(
-        address _address,
-        uint256 _id
-    ) public view returns (uint256) {
+    function getBookStatus(address _address,uint256 _id) public view returns (uint256) {
         return borrowerToBookIdsToStatus[_address][_id];
     }
 
     // Function to return a borrowed book to the library
     function backBarrowBook(uint256 _id) public bookMustExist(_id) {
-        require(
-            borrowerToBookIdsToStatus[msg.sender][_id] == BORROWED,
-            "You need to have the book first!"
-        );
+        require(borrowerToBookIdsToStatus[msg.sender][_id] == BORROWED,"You need to have the book first!");
 
         borrowerToBookIdsToStatus[msg.sender][_id] = RETURNED;
         books[_id].borrowed = books[_id].borrowed - 1;
